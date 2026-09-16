@@ -1,0 +1,46 @@
+// p5.js: 가변저항값 수신 후 파일 저장
+
+let port;
+let out, value = 0; 
+
+function setup() {
+  createCanvas(500, 300);
+  port = new p5.SerialPort();
+  port.open("COM5");
+  port.on('data', serialEvent);
+  out = createWriter("data.txt");		// ❶ 저장할 파일 생성
+}
+
+function draw() {
+  background(0);
+  let h = hour();
+  let m = minute();
+  let s = second();
+  // 시간, 분, 초를 표시
+  fill(255, 255, 0);
+  textAlign(CENTER);
+  textSize(30);
+  text("Time: " + nf(h, 2) + ":" + nf(m, 2) + ":" + nf(s, 2), width/2, 50);
+
+  // 가변저항값을 표시
+  textSize(50);
+  text("Variable R: " + nf(value, 4), width/2, height/2);
+  // ❷ 시간, 분, 초, 가변저항값을 차례로 파일에 쓰기
+  out.print(h + ":" + m + ":" + s + ":" + nf(value, 4));
+}
+
+function serialEvent() {
+  while (port.available() >= 3) {
+    let signal = port.readChar();
+    if (signal === 'A') {
+      let value1 = port.read();
+      let value2 = port.read();
+      value = value1 * 100 + value2;
+    }
+  }
+}
+
+function mousePressed() {
+  out.close();			// ❸ 파일 닫기
+  print("File Closed!");
+}

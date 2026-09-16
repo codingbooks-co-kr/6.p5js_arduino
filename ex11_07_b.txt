@@ -1,0 +1,33 @@
+// p5.js: 가변저항값 2개 수신하여 원 이동 1
+
+let port;
+let value1 = 0, value2 = 0;
+
+function setup() {
+  createCanvas(500, 500);
+  port = new p5.SerialPort();
+  port.open("COM5");
+  port.on('data', serialEvent);
+}
+
+function draw() {
+  // 페이딩 효과
+  noStroke();
+  fill(0, 10);
+  rect(0, 0, width, height);
+  
+  fill(255, 255, 0); 
+  ellipse(value1, value2, 50, 50);
+}
+
+function serialEvent() {
+  while (port.available() >= 3) {	
+    let signal = port.readChar();
+    if (signal === 'A') {
+      value1 = port.read();
+      value2 = port.read();
+      value1 = map(value1, 0, 255, 0, width);
+      value2 = map(value2, 0, 255, 0, height);
+    }
+  }
+}

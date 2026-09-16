@@ -1,0 +1,38 @@
+// p5.js: 가변저항값 2개와 버튼값 수신하여 원 이동
+
+let port;
+let value1 = 0, value2 = 0;
+let state = false;
+
+function setup() {
+  createCanvas(500, 500);
+  port = new p5.SerialPort();
+  port.open("COM5");
+  port.on('data', serialEvent);
+}
+
+function draw() {
+  // 페이딩 효과
+  noStroke();
+  fill(0, 10);
+  rect(0, 0, width, height);
+
+  if (state) {
+    fill(255, 0, 0);
+  } else {
+    fill(255, 255, 0);
+  }
+  ellipse(value1, value2, 50, 50);
+}
+
+function serialEvent() {
+  let str = port.readLine();
+  if (!str) return;
+  let s = trim(str);
+  let value = split(s, ",");
+  value1 = map(float(value[0]), 0, 1023, 0, width);
+  value2 = map(float(value[1]), 0, 1023, 0, height);
+  if (value[2] === "pressed") {
+    state = !state;
+  }
+}

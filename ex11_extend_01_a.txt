@@ -1,0 +1,55 @@
+// p5.js: 버튼값 수신하여 원 색상 변경1
+
+let port;
+let value = 0;
+let option = {baudRate: 9600};		// 시리얼 통신을 위한 통신속도 설정
+
+function setup() {
+  createCanvas(500, 500);
+  port = new p5.SerialPort();		// 시리얼 포트 객체 생성
+  port.list();			// 시리얼 포트 리스트 얻기
+  port.open("COM5", option);		// (포트명, 통신속도)로 시리얼 포트 열기
+  port.on("connected", serverConnected);  // 시리얼 포트가 연결되면 콜백함수 호출
+  port.on("list", gotList);		// 포트 리스트를 얻으면 콜백함수 호출
+  port.on("open", gotOpen);		// 시리얼 포트가 열리면 콜백함수 호출
+  port.on("close", gotClose);		// 시리얼 포트가 닫히면 콜백함수 호출
+  port.on("error", gotError);		// 시리얼 포트 오류 시 콜백함수 호출
+  port.on("data", gotData);		// 데이터를 수신하면 콜백함수(gotData) 호출
+}
+
+function draw() {
+  background(0);
+  if (value === 0) {
+    fill(255, 255, 0);
+  } else {
+    fill(255, 0, 0);
+  }
+  ellipse(width/2, height/2, 200, 200);
+} 
+
+function gotData() {			// 데이터를 수신하면 콜백함수(gotData) 실행
+  value = port.read();
+}
+
+function serverConnected() {		// 시리얼 포트가 연결되면 콜백함수 실행
+  print("Connected to Server");
+}
+
+function gotList(list) {		// 포트 리스트를 얻으면 콜백함수(gotList) 실행
+  print("List of Serial Ports:");
+  for (let i = 0; i < list.length; i++) {
+    print(i + " " + list[i]);
+  }
+}
+
+function gotOpen() {			// 시리얼 포트가 열리면 콜백함수 실행
+  print("Serial Port is Open");
+}
+
+function gotClose() {			// 시리얼 포트가 닫히면 콜백함수(gotClose) 실행
+  print("Serial Port is Closed");
+}
+
+function gotError(error) {		// 시리얼 포트 오류 시 콜백함수(gotError) 실행
+  print(error);
+}

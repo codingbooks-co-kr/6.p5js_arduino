@@ -1,0 +1,24 @@
+// p5.js: 폴링(polling) 방식
+// 버튼값 수신하여 원 색상 변경
+
+let port, value;
+
+function setup() {
+  createCanvas(500, 500);
+  port = new p5.SerialPort();
+  port.open("COM5");
+}
+
+function draw() {
+  background(0);
+  // 수신값이 있으면 데이터 읽기
+  while (port.available() >= 1) {
+    value = port.read();   // 값 수신
+  }
+  if (value === 0) {
+    fill(255, 255, 0);
+  } else {
+    fill(255, 0, 0);
+  }
+  ellipse(width/2, height/2, 200, 200);
+}

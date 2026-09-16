@@ -1,0 +1,30 @@
+// p5.js: 가변저항값 수신하여 표시 3
+
+let port;
+let value = 0;
+
+function setup() {
+  createCanvas(500, 300);
+  port = new p5.SerialPort();
+  port.open("COM5");
+  port.on('data', serialEvent);
+}
+
+function draw() {
+  background(0);
+  fill(255, 255, 0);
+  textAlign(CENTER);
+  textSize(50);
+  text("Variable R: " + nf(value, 4), width/2, height/2);
+}
+
+function serialEvent() {
+  while (port.available() >= 3) {
+    let signal = port.read();
+    if (signal === 0xff) {
+      let high_byte = port.read();
+      let low_byte = port.read();
+      value = (high_byte << 8) | low_byte;
+    }
+  }
+}

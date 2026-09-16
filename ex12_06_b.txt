@@ -1,0 +1,39 @@
+// p5.js: 인터럽트 방식
+// 마우스 클릭값 송신, 버튼 클릭값 수신
+
+let port;
+let value = 0;
+
+function setup() {
+  createCanvas(500, 500);
+  port = new p5.SerialPort();
+  port.open("COM5");
+  port.on('open', serialOpen);
+  port.on('data', serialEvent);
+}
+
+function draw() {
+  background(0);
+  ellipse(width/2, height/2, 200, 200);
+}
+
+function serialOpen() {
+  print("Start!");
+  port.clear();
+  port.write(0);
+}
+
+function serialEvent() {
+  value = port.read();	
+  if (value === 0) {
+    fill(255, 255, 0);
+  } else {
+    fill(255, 0, 0);
+  }
+
+  if (mouseIsPressed) {
+    port.write(1);
+  } else {
+    port.write(0);
+  }
+}

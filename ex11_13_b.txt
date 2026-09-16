@@ -1,0 +1,51 @@
+// p5.js: 파일에 저장된 값을 읽어 아두이노로 송신
+
+let port, inp, num = 0, value = [];
+
+function setup() {
+  createCanvas(500, 300);
+  port = new p5.SerialPort();
+  port.open("COM5");
+  createP("Please choose a text file!");
+  inp = createFileInput(readFile);
+}
+
+function draw() {
+  background(0);
+  if (value.length > 0 && value.length > num + 3) {
+    let h = int(value[num]);
+    let m = int(value[num + 1]);
+    let s = int(value[num + 2]); 
+    let val = int(value[num + 3]);
+
+    // 시, 분, 초 표시
+    fill(255, 255, 0);
+    textAlign(CENTER);
+    textSize(30);
+    text("Time: " + nf(h, 2) + ":" + nf(m, 2) + ":" + nf(s, 2), width / 2, 50);
+
+    // 가변저항값 표시
+    textSize(50);
+    text("Variable R: " + nf(val, 4), width / 2, height / 2);
+    
+    // 가변저항값 송신
+    val = int(map(val, 0, 1023, 0, 255));
+    port.write(val);
+    num += 4;
+  }
+}
+
+function readFile(file) {
+  print(file.name, file.type, file.size);
+  if (file.type === "text") {
+    let str = file.data;
+    value = splitTokens(str, ":\n");
+  } else {
+    createP("Please choose a text file!");	
+  }
+}
+
+function keyPressed() {
+  if (key === "a")
+    num = 0;
+}
